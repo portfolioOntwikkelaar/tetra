@@ -3,25 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Neon Grid Glow</title>
   <link rel="stylesheet" href="master.css">
-  <title>effect20</title>
 </head>
 <body>
   <div id="container">
-    <div id="cursor"></div>
-  </div>
-  <script>
-    for (var i = 0; i < 150; i++) {
-      let box = document.createElement('span');
-      document.getElementById('container').appendChild(box);
-    }
-    let cursor = document.getElementById('cursor');
-    window.onmousemove = function(e){
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
+  <div id="glow"></div>
+  <div id="cursor"></div>
+</div>
 
-    }
+  <script>
+    const container = document.getElementById('container');
+const cursor = document.getElementById('cursor');
+const glow = document.getElementById('glow');
+
+// 🟩 Maak grid
+const boxes = [];
+for (let i = 0; i < 900; i++) {
+  const box = document.createElement('span');
+  container.appendChild(box);
+  boxes.push(box);
+}
+
+// 🌀 Cursor volgen
+let mouse = { x: window.innerWidth/2, y: window.innerHeight/2 };
+window.onmousemove = (e) => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+  cursor.style.left = mouse.x + 'px';
+  cursor.style.top = mouse.y + 'px';
+  glow.style.left = mouse.x + 'px';
+  glow.style.top = mouse.y + 'px';
+};
+window.addEventListener('mousemove', (e) => {
+  const x = e.pageX;
+  const y = e.pageY;
+
+  cursor.style.left = x + 'px';
+  cursor.style.top = y + 'px';
+  glow.style.left = x + 'px';
+  glow.style.top = y + 'px';
+});
+
+
+// ✨ Glow effect voor grid
+function animate() {
+  boxes.forEach(box => {
+    const rect = box.getBoundingClientRect();
+    const bx = rect.left + rect.width/2;
+    const by = rect.top + rect.height/2;
+
+    const dx = bx - mouse.x;
+    const dy = by - mouse.y;
+    const distance = Math.sqrt(dx*dx + dy*dy);
+
+    const maxDist = 150;
+    const intensity = Math.max(0, 1 - distance / maxDist);
+
+    box.style.background = `rgba(0,255,255,${0.02 + intensity*0.25})`;
+    box.style.boxShadow = intensity > 0 ? `0 0 ${30*intensity}px rgba(0,255,255,${intensity*0.6})` : 'none';
+  });
+
+  requestAnimationFrame(animate);
+}
+animate();
   </script>
 </body>
 </html>
